@@ -1,0 +1,17 @@
+{
+    "professores": {
+        "100": {
+            "nome": "alan",
+            "materia": "programacao",
+            "alunos": [
+                "3"
+            ]
+        }
+    },
+    "alunos": {
+        "3": {
+            "nome": "lucas",
+            "professor_cpf": "100"
+        }
+    }
+}
