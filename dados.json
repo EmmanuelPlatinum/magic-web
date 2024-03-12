@@ -1,0 +1,17 @@
+{
+    "professores": {
+        "0": {
+            "nome": "Felipe",
+            "materia": "Progama\u00e7\u00e3o",
+            "alunos": [
+                "01"
+            ]
+        }
+    },
+    "alunos": {
+        "01": {
+            "nome": "Emmanuel",
+            "professor_cpf": "0"
+        }
+    }
+}

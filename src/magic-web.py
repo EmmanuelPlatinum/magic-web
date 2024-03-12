@@ -1,6 +1,7 @@
-# Importando bibliotecas
+# Importar bibliotecas
 import os
 import json
+
 # Definindo dicionários para armazenar dados
 professores = {}
 alunos = {}
@@ -44,16 +45,13 @@ def cadastrar_aluno(nome, cpf, professor_cpf):
 
     print(f"Aluno {nome} cadastrado com sucesso!")
 
-
 def carregar_dados_json():
     with open("dados.json", "r") as arquivo:
         dados = json.load(arquivo)
 
     return dados["professores"], dados["alunos"]
 
-
-
-# Função para listar professores
+# Função para listar alunos
 def listar_alunos():
     professores, alunos = carregar_dados_json()
 
@@ -63,73 +61,80 @@ def listar_alunos():
         print(f"Professor: {professores[dados['professor_cpf']]['nome']}")
         print()
 
-
 def escolher_professor():
     while True:
         cpf = input("Digite o CPF do professor: ")
         if cpf not in professores:
             print(f"Professor com CPF {cpf} não encontrado!")
-            continue
+            #return None
         else:
-            break
-    return cpf
+            return cpf
 
 def listar_dados_professor(cpf):
+    if cpf not in professores:
+        print(f"Professor com CPF {cpf} não encontrado!")
+        return False
+
     print(f"**Professor:** {professores[cpf]['nome']}")
     print(f"Matéria: {professores[cpf]['materia']}")
     print(f"Alunos:")
     for aluno_cpf in professores[cpf]['alunos']:
         print(f" - {alunos[aluno_cpf]['nome']}")
     print()
+    return True
 
+def listar_professores():
+    if not professores:
+        print("Nenhum professor cadastrado.")
+        return
 
+    print("Professores:")
+    for cpf, dados in professores.items():
+        print(f"CPF: {cpf}")
+        print(f"Nome: {dados['nome']}")
+        print(f"Materia: {dados['materia']}")
+        print()
 
+def listar_todos_alunos():
+    if not alunos:
+        print("Nenhum aluno cadastrado.")
+        return
 
+    print("Alunos:")
+    for cpf, dados in alunos.items():
+        print(f"CPF: {cpf}")
+        print(f"Nome: {dados['nome']}")
+        print(f"Professor: {professores[dados['professor_cpf']]['nome']}")
+        print()
+
+def deletar_professor():
+    listar_professores()
+    cpf_professor = escolher_professor()
+    if cpf_professor:
+        del professores[cpf_professor]
+        for aluno_cpf in alunos.values():
+            if aluno_cpf['professor_cpf'] == cpf_professor:
+                aluno_cpf['professor_cpf'] = None
+        salvar_dados_json()
+        print(f"Professor com CPF {cpf_professor} deletado com sucesso!")
+
+def deletar_aluno():
+    listar_todos_alunos()
+    cpf_aluno = input("Digite o CPF do aluno: ")
+    if cpf_aluno in alunos:
+        professor_cpf = alunos[cpf_aluno]['professor_cpf']
+        alunos.pop(cpf_aluno)
+        professores[professor_cpf]['alunos'].remove(cpf_aluno)
+        salvar_dados_json()
+        print(f"Aluno com CPF {cpf_aluno} deletado com sucesso!")
+    else:
+        print(f"Aluno com CPF {cpf_aluno} não encontrado!")
 
 def salvar_dados_json():
     with open("dados.json", "w") as arquivo:
         json.dump({"professores": professores, "alunos": alunos}, arquivo, indent=4)
 
     print("Dados salvos em dados.json com sucesso!")
-
-
-def deletar_professor(cpf):
-    if cpf not in professores:
-        print(f"Professor com CPF {cpf} não encontrado!")
-        return
-
-    # Deletar o professor do dicionário
-    del professores[cpf]
-
-    # Deletar o professor da lista de alunos de seus alunos
-    for aluno_cpf in alunos.values():
-        if aluno_cpf['professor_cpf'] == cpf:
-            aluno_cpf['professor_cpf'] = None
-
-    salvar_dados_json()
-
-    print(f"Professor com CPF {cpf} deletado com sucesso!")
-
-
-
-def deletar_aluno(cpf):
-    if cpf not in alunos:
-        print(f"Aluno com CPF {cpf} não encontrado!")
-        return
-
-    # Deletar o aluno do dicionário
-    del alunos[cpf]
-
-    # Remover o aluno da lista de alunos do professor
-    professor_cpf = alunos[cpf]['professor_cpf']
-    professores[professor_cpf]['alunos'].remove(cpf)
-
-    salvar_dados_json()
-
-    print(f"Aluno com CPF {cpf} deletado com sucesso!")
-
-cpf_aluno = input("Digite o CPF do aluno: ")
-deletar_aluno(cpf_aluno)
 
 # Menu principal
 while True:
@@ -160,17 +165,16 @@ while True:
         salvar_dados_json()
 
     elif opcao == "3":
-        cpf_professor = escolher_professor()
-        listar_dados_professor(cpf_professor)
+        listar_professores()
 
     elif opcao == "4":
         listar_alunos()
+
     elif opcao == '5':
-        cpf_professor = escolher_professor()
-        deletar_professor(cpf_professor)
+        deletar_professor()
+
     elif opcao == '6':
-        cpf_aluno = input("Digite o CPF do aluno: ")
-        deletar_aluno(cpf_aluno)
+        deletar_aluno()
 
     elif opcao == "0":
         break
@@ -179,4 +183,3 @@ while True:
         print("Opção inválida!")
 
     input("Pressione qualquer tecla para continuar...")
-
